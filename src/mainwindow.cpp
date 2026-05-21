@@ -909,7 +909,7 @@ void saveNonPBR(const QString& directory, const QString& namePath, const QString
     if(resize != -1)
         options.resizeBounds = vtfpp::ImageConversion::ResizeBounds(resize);
 
-    options.initialFrameCount = 4;
+    options.initialFrameCount = 5;
     auto baseColorVTF = vtfpp::VTF::create(baseColorAsset->getPath().toStdString(), options);
 
     if(OptionsMenu::isKVDataEnabled())
@@ -918,11 +918,13 @@ void saveNonPBR(const QString& directory, const QString& namePath, const QString
     baseColorVTF.setImage(metalAsset->getPath().toStdString(), vtfpp::ImageConversion::ResizeFilter::DEFAULT, 0, 1);
     baseColorVTF.setImage(roughnessAsset->getPath().toStdString(), vtfpp::ImageConversion::ResizeFilter::DEFAULT, 0, 2);
     baseColorVTF.setImage(aoAsset->getPath().toStdString(), vtfpp::ImageConversion::ResizeFilter::DEFAULT, 0, 3);
+    baseColorVTF.setImage(tintAsset->getPath().toStdString(), vtfpp::ImageConversion::ResizeFilter::DEFAULT, 0, 4);
 
     auto rawBaseColor = baseColorVTF.getImageDataRaw();
     auto rawMetallic = baseColorVTF.getImageDataRaw(0, 1);
     auto rawRoughness = baseColorVTF.getImageDataRaw(0, 2);
     auto rawAO = baseColorVTF.getImageDataRaw(0, 3);
+    auto rawTint = baseColorVTF.getImageDataRaw(0,4);
 
     std::vector<std::byte> newMetallic;
 
@@ -997,9 +999,15 @@ void saveNonPBR(const QString& directory, const QString& namePath, const QString
             auto mask1 = genEnvMask();
             newBaseColor = operateImage(newBaseColor, mask1, baseColorVTF.getFormat(), baseColorVTF.getWidth(), baseColorVTF.getHeight(), SetAlpha);
         }
+        else if(tintAsset->operator bool())
+            operateImage(newBaseColor, rawTint,baseColorVTF.getFormat(), baseColorVTF.getWidth(), baseColorVTF.getHeight(), SetAlpha);
         else
             baseColorVTF.removeFlags(vtfpp::VTF::FLAG_V0_MULTI_BIT_ALPHA);
 
+    }
+    else if(tintAsset->operator bool())
+    {
+        operateImage(newBaseColor, rawTint,baseColorVTF.getFormat(), baseColorVTF.getWidth(), baseColorVTF.getHeight(), SetAlpha);
     }
 
     if(normalAsset->operator bool()){
