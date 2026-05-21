@@ -301,7 +301,9 @@ void genericParameters(PBRType type, GameType game, const QString &pathName, QSt
         vmt=vmt.arg("$alphatest\t1\n\t%1");
     }
 
-    if( type == PBRType::MODEL_PHONG_ENVMAP_ALPHA || type == PBRType::BRUSH_ENVMAP_ALPHA )
+    bool hasTint = PBRAssets::getAsset(TINT_MAP)->operator bool();
+
+    if(!hasTint && (type == PBRType::MODEL_PHONG_ENVMAP_ALPHA || type == PBRType::BRUSH_ENVMAP_ALPHA) )
     {
         vmt=vmt.arg("$transparency\t1\n\t%1");
     }
@@ -375,6 +377,14 @@ void genericParameters(PBRType type, GameType game, const QString &pathName, QSt
         vmt=vmt.arg("$detail\t\"%1\"\n\t%2").arg(pathName + "_" + SuffixNameWidget::getSuffixName(EmissiveMapName));
         vmt=vmt.arg("$detailscale\t1\n\t%1");
         vmt=vmt.arg("$detailblendmode\t5\n\t%1");
+    }
+
+    if(type < ALL_PBR && hasTint)
+    {
+        vmt=vmt.arg("$blendtintbymraoalpha\t1\n\t%1");
+    } else if(hasTint && type == MODEL_PHONG_ENVMAP_ALPHA)
+    {
+        vmt=vmt.arg("$$blendtintbybasealpha\t1\n\t%1");
     }
 
 }
@@ -1540,7 +1550,7 @@ QString OptionsMenu::getFullMetaData() {
 
 bool OptionsMenu::isKVDataEnabled()
 {
-    return true;
+    return OptionsMenu::isEnabled;
 }
 
 SuffixNameWidget::SuffixNameWidget(QWidget *parent, SuffixNames nameType, const QString &displayName)
