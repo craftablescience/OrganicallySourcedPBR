@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
     QApplication::setOrganizationName("Project Collapse Studios");
     QApplication::setOrganizationDomain("ORG");
     QApplication::setApplicationVersion("0.1.0");
+    QApplication::setWindowIcon(QIcon(QPixmap(":/logo.png")));
 
     auto main = new CMainWindow();
     main->show();

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=OrganicallySourcedPBR
+Comment=An improved C++ remake of PBR-2-Source
+Exec=sh -c 'if [ -n "$__NV_PRIME_RENDER_OFFLOAD" ]; then export QT_QPA_PLATFORM=xcb; fi; exec OrganicallySourcedPBR "$@"' _ %f
+Icon=OrganicallySourcedPBR
+Terminal=false
+Type=Application
+Categories=Qt;Development;Utility;

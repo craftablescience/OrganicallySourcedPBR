@@ -15,6 +15,7 @@
 #include <QPushButton>
 #include <QMenuBar>
 #include <QSettings>
+#include <QApplication>
 #include <cmath>
 
 constexpr char supported_images[] = "*.png *.jpg *.jpeg *.exr *.bmp *.psd *.gif *.pic *.hdr *.tga *.qoi *.webp";
@@ -111,6 +112,8 @@ public:
 
 CMainWindow::CMainWindow() : QMainWindow()
 {
+    this->setWindowTitle(tr("Creation Menu"));
+
     auto centralWidget = new CPBRWindow(this);
     this->setCentralWidget(centralWidget);
 
@@ -118,7 +121,9 @@ CMainWindow::CMainWindow() : QMainWindow()
 
     this->menuBar()->addAction(tr("Options"), this->menu, &OptionsMenu::exec);
     connect(this->menu, &OptionsMenu::finished, centralWidget, &CPBRWindow::markDirty);
-
+    auto aboutMenu = this->menuBar()->addMenu(tr("About"));
+    aboutMenu->addAction(tr("About QT"), &QApplication::aboutQt);
+//    aboutMenu->addAction(tr("Organically Sourced PBR"), &AboutDialog::aboutOSPBR);
 }
 
 void applyDisplaySettings(QLabel* label)
@@ -1462,6 +1467,8 @@ void OptionsMenu::setOptionsAndDefaults()
 
 OptionsMenu::OptionsMenu(QWidget *parent) : QDialog(parent)
 {
+    this->setWindowTitle(tr("Options Menu"));
+
     this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
 
     auto layout = new QGridLayout(this);
@@ -1591,4 +1598,14 @@ QString SuffixNameWidget::getCurrentSuffixName() {
         return getDefaultTextureNames(suffixNameType);
 
     return this->suffixName->text().replace(' ', '_');
+}
+
+AboutDialog::AboutDialog(QWidget *parent) : QTextEdit(parent)
+{
+    this->setAcceptRichText(true);
+//    this->setText();
+    auto layout = new QHBoxLayout(this);
+    auto okButton = new QPushButton(this);
+    layout->addWidget(okButton);
+    connect(okButton, &QPushButton::clicked, this, &QTextEdit::close);
 }

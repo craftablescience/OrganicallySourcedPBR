@@ -9,3 +9,6 @@ Supporting all image formats that SourcePP supports.
 
 ## Libraries:
 [SourcePP by CraftableScience](https://sourcepp.org/)
+
+## Additional:
+Open file icons from [Google Fonts](https://fonts.google.com/icons)

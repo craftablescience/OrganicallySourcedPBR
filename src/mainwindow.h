@@ -4,11 +4,11 @@
 #include <QDialog>
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
+#include <QTextEdit>
 #include "vtfpp/ImageFormats.h"
 
 class QPathLineEdit;
 class QLabel;
-class QTextEdit;
 class QLineEdit;
 class QComboBox;
 class QSettings;
@@ -110,16 +110,17 @@ public:
     }
 };
 
-//enum VTFMetaData : uint8_t
-//{
-//    Author = 0,
-//    Contact,
-//    Organization,
-//    Version,
-//    Modification,
-//    Description,
-//    Comment
-//};
+class AboutDialog : public QTextEdit
+{
+    explicit AboutDialog(QWidget* parent);
+public:
+
+    static void aboutOSPBR()
+    {
+        static auto about = new AboutDialog(nullptr);
+        about->show();
+    }
+};
 
 class OptionsMenu : public QDialog
 {
