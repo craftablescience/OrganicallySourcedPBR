@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
-project(OrganicallySourcedPBR DESCRIPTION "An improved C++ remake of PBR-2-Source")
+project(OrganicallySourcedPBR
+        DESCRIPTION "An improved C++ remake of PBR-2-Source"
+        HOMEPAGE_URL "https://github.com/Trico-Everfire/OrganicallySourcedPBR")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,14 +15,13 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/res/logo.rc")
-
-qt_add_executable(OrganicallySourcedPBR main.cpp
+qt_add_executable(OrganicallySourcedPBR
+        main.cpp
         res/res.qrc
         src/nl_NL.ts
         src/mainwindow.cpp
         src/mainwindow.h
-        ${app_icon_resource_windows})
+        "$<$<BOOL:${WIN32}>:res/logo.rc>")
 
 
 set(SOURCEPP_LIBS_START_ENABLED OFF CACHE INTERNAL "" FORCE)
@@ -37,7 +38,30 @@ target_link_libraries(OrganicallySourcedPBR PRIVATE
 
 option(OGP_INSTALL "Configure install and CPack rules for OrganicallySourcedPBR" OFF)
 if(OGP_INSTALL)
-    if(UNIX)
+    if(WIN32)
+        install(FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+            DESTINATION .)
+
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
+
+        # Qt
+        install(IMPORTED_RUNTIME_ARTIFACTS
+                Qt6::Core Qt6::Gui Qt6::Widgets
+                RUNTIME DESTINATION .
+                LIBRARY DESTINATION .)
+
+        install(FILES "${QT_BASEDIR}/plugins/platforms/qwindows${QT_LIB_SUFFIX}.dll"
+                DESTINATION "platforms")
+
+        if(EXISTS "${QT_BASEDIR}/plugins/styles/qmodernwindowsstyle${QT_LIB_SUFFIX}.dll")
+            install(FILES "${QT_BASEDIR}/plugins/styles/qmodernwindowsstyle${QT_LIB_SUFFIX}.dll"
+                    DESTINATION "styles")
+        else()
+            install(FILES "${QT_BASEDIR}/plugins/styles/qwindowsvistastyle${QT_LIB_SUFFIX}.dll"
+                    DESTINATION "styles")
+        endif()
+    elseif(UNIX)
         install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
                 DESTINATION "share/licenses/${PROJECT_NAME}")
 
@@ -74,7 +98,18 @@ if(OGP_INSTALL)
     set(CPACK_THREADS 0)
     set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
     if(WIN32)
-        # todo
+        if(CPACK_GENERATOR STREQUAL "NSIS")
+            set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
+            set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+            set(CPACK_NSIS_DISPLAY_NAME ${PROJECT_NAME})
+            set(CPACK_NSIS_PACKAGE_NAME ${PROJECT_NAME})
+            set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/res/logo.ico")
+            set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}.exe")
+            set(CPACK_NSIS_URL_INFO_ABOUT "${PROJECT_HOMEPAGE_URL}")
+            set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
+        else()
+            message(FATAL_ERROR "CPACK_GENERATOR is unset! Only NSIS generator is supported.")
+        endif()
     else()
         if(CPACK_GENERATOR STREQUAL "DEB")
             set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/Trico-Everfire/OrganicallySourcedPBR")
